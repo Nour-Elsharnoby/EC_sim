@@ -157,7 +157,7 @@ root = tk.Tk()
 root.title("Draw Line Between Circles")
 
 # Create a canvas to draw on
-canvas = tk.Canvas(root, width=400, height=400)
+canvas = tk.Canvas(root, width=1200, height=1200)
 canvas.pack()
 
 # Variables to keep track of circle coordinates and click state
