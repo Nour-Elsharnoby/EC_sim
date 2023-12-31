@@ -221,9 +221,9 @@ class Inductance_Class:
 
     def draw_Inductance(self):
         self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="inductance1")
-        self.body2 = self.half_circle = self.canvas.create_oval(self.x+15, self.y-12, self.x+39, self.y+12, outline=self.color, width=3, tags="inductance2")
-        self.body3 = self.half_circle = self.canvas.create_oval(self.x+33, self.y-12, self.x+57, self.y+12, outline=self.color, width=3, tags="inductance3")
-        self.body4 = self.half_circle = self.canvas.create_oval(self.x+51, self.y-12, self.x+75, self.y+12, outline=self.color, width=3, tags="inductance4")
+        self.body2 = self.canvas.create_oval(self.x+15, self.y-12, self.x+39, self.y+12, outline=self.color, width=3, tags="inductance2")
+        self.body3 = self.canvas.create_oval(self.x+33, self.y-12, self.x+57, self.y+12, outline=self.color, width=3, tags="inductance3")
+        self.body4 = self.canvas.create_oval(self.x+51, self.y-12, self.x+75, self.y+12, outline=self.color, width=3, tags="inductance4")
         self.body5 = self.canvas.create_line(self.points2, smooth="false", width=3, fill=self.color, tags="inductance5")
 
     def on_press(self, event):
@@ -313,22 +313,51 @@ class Inductance_Class:
 class DC_Power_Class:
     def __init__(self, canvas):
         self.canvas = canvas
-        x = 90
-        y = 120
-        self.points = []
-        self.body = None
+        self.x = 90
+        self.y = 120
+        self.points1 = [self.x,self.y,self.x+15,self.y]
+        self.points2 = [self.x+24,self.y, self.x+40,self.y]
+        self.points3 = [self.x+50,self.y, self.x+66,self.y]
+        self.points4 = [self.x+58,self.y+8, self.x+58,self.y-8]
+        self.points5 = [self.x+75,self.y,self.x+90,self.y]
+        self.body1 = None
+        self.body2 = None
+        self.body3 = None
+        self.body4 = None
+        self.body5 = None
+        self.body6 = None
         self.value = "10"
         self.color = None
 
-        self.draw_resistor()
+        self.draw_dc()
         
         # ربط حدث النقر والسحب
-        self.canvas.tag_bind(self.body, "<ButtonPress-1>", self.on_press)
-        self.canvas.tag_bind(self.body, "<B1-Motion>", self.on_drag)
-        self.canvas.tag_bind(self.body, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body1, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body1, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body1, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body2, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body2, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body2, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body3, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body3, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body3, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body4, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body4, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body4, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body5, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body5, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body5, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body6, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body6, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body6, "<Button-3>", self.show_context_menu)
 
-    def draw_resistor(self):
-        self.body = self.canvas.create_line(self.points, smooth="false", width=3, fill=self.color, tags="resistor")
+    def draw_dc(self):
+        self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="dc1")
+        self.body2 = self.canvas.create_oval(self.x+15, self.y-30, self.x+75, self.y+30, outline=self.color, width=3, tags="dc2")
+        self.body3 = self.canvas.create_line(self.points2, smooth="false", width=3, fill=self.color, tags="dc3")
+        self.body4 = self.canvas.create_line(self.points3, smooth="false", width=3, fill=self.color, tags="dc4")
+        self.body5 = self.canvas.create_line(self.points4, smooth="false", width=3, fill=self.color, tags="dc5")
+        self.body6 = self.canvas.create_line(self.points5, smooth="false", width=3, fill=self.color, tags="dc6")
 
     def on_press(self, event):
         # حفظ موقع بداية السحب
@@ -357,7 +386,12 @@ class DC_Power_Class:
         evy = cy*15
         delta_x = evx - self.start_x
         delta_y = evy - self.start_y
-        self.canvas.move(self.body, delta_x, delta_y)
+        self.canvas.move(self.body1, delta_x, delta_y)
+        self.canvas.move(self.body2, delta_x, delta_y)
+        self.canvas.move(self.body3, delta_x, delta_y)
+        self.canvas.move(self.body4, delta_x, delta_y)
+        self.canvas.move(self.body5, delta_x, delta_y)
+        self.canvas.move(self.body6, delta_x, delta_y)
         self.start_x = evx
         self.start_y = evy
 
@@ -369,50 +403,86 @@ class DC_Power_Class:
         color_menu.add_command(label="yellow", command=lambda: self.change_color("yellow"))
         menu.add_cascade(label="color", menu=color_menu)
         menu.add_command(label="value", command=self.change_value)
-        menu.add_command(label="rotate", command=self.rotate_resistor_right)
-        menu.add_command(label="delete", command=self.delete_combo)
+        menu.add_command(label="rotate", command=self.rotate_dcpower_right)
+        menu.add_command(label="delete", command=self.delete_dc)
         menu.post(event.x_root, event.y_root)
 
     def change_color(self, new_color):
             self.color = new_color
-            self.canvas.itemconfig(self.body, fill=self.color)
+            self.canvas.itemconfig(self.body1, fill=self.color)
+            self.canvas.itemconfig(self.body2, outline=self.color)
+            self.canvas.itemconfig(self.body3, fill=self.color)
+            self.canvas.itemconfig(self.body4, fill=self.color)
+            self.canvas.itemconfig(self.body5, fill=self.color)
+            self.canvas.itemconfig(self.body6, fill=self.color)
 
     def change_value(self):
         new_value = simpledialog.askstring("تغيير اسم الكرة", "الرجاء إدخال اسم جديد:", initialvalue=self.value)
         if new_value:
             self.value = new_value
 
-    def rotate_resistor_right(self):
-        a,A,b,B,c,C,d,D,e,E,f,F,g,G,h,H,i,I,j,J = self.canvas.coords(self.body)
-        new_coords = [j,J-90,j,J-75,j-10,J-70,j+10,J-60,j-10,J-50,j+10,J-40,j-10,J-30,j+10,J-20,j,J-15,j,J]
-
-        self.canvas.coords(self.body, *new_coords)
+    def rotate_dcpower_right(self):
+        a,b,c,d = self.canvas.coords(self.body6)
+        n1=[c,d-90,c,d-75]
+        n2=[c-30,d-75,c+30,d-15]
+        n3=[c,d-66,c,d-50]
+        n4=[c,d-40,c,d-24]
+        n5=[c+8,d-32,c-8,d-32]
+        n6=[c,d-15,c,d]
+        self.canvas.coords(self.body1, n1)
+        self.canvas.coords(self.body2, n2)
+        self.canvas.coords(self.body3, n3)
+        self.canvas.coords(self.body4, n4)
+        self.canvas.coords(self.body5, n5)
+        self.canvas.coords(self.body6, n6)
         
 
-    def delete_combo(self):
-        self.canvas.delete(self.body)
+    def delete_dc(self):
+        self.canvas.delete(self.body1)
+        self.canvas.delete(self.body2)
+        self.canvas.delete(self.body3)
+        self.canvas.delete(self.body4)
+        self.canvas.delete(self.body5)
+        self.canvas.delete(self.body6)
 
 #################################################################################################################################################
-'''
-class Resistor_Class:
+        
+class AC_Power_Class:
     def __init__(self, canvas):
         self.canvas = canvas
-        x = 90
-        y = 120
-        self.points = [x, y, x+15, y, x+20, y+10, x+30, y-10, x+40, y+10, x+50, y-10, x+60, y+10, x+70,y-10 , x+75, y, x+90, y]
-        self.body = None
+        self.x = 90
+        self.y = 120
+        self.points1 = [self.x,self.y,self.x+15,self.y]
+        self.points2 = [self.x+25, self.y, self.x+35, self.y-20,self.x+45,self.y, self.x+55, self.y+20, self.x+65, self.y]
+        self.points3 = [self.x+75,self.y,self.x+90,self.y]
+        self.body1 = None
+        self.body2 = None
+        self.body3 = None
+        self.body4 = None
         self.value = "10"
         self.color = None
 
-        self.draw_resistor()
+        self.draw_ac()
         
         # ربط حدث النقر والسحب
-        self.canvas.tag_bind(self.body, "<ButtonPress-1>", self.on_press)
-        self.canvas.tag_bind(self.body, "<B1-Motion>", self.on_drag)
-        self.canvas.tag_bind(self.body, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body1, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body1, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body1, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body2, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body2, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body2, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body3, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body3, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body3, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body4, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body4, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body4, "<Button-3>", self.show_context_menu)
 
-    def draw_resistor(self):
-        self.body = self.canvas.create_line(self.points, smooth="false", width=3, fill=self.color, tags="resistor")
+    def draw_ac(self):
+        self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="ac1")
+        self.body2 = self.canvas.create_oval(self.x+15, self.y-30, self.x+75, self.y+30, outline=self.color, width=3, tags="ac2")
+        self.body3 = self.canvas.create_line(self.points2, smooth="true", width=3, fill=self.color, tags="ac5")
+        self.body4 = self.canvas.create_line(self.points3, smooth="false", width=3, fill=self.color, tags="ac5")
 
     def on_press(self, event):
         # حفظ موقع بداية السحب
@@ -441,7 +511,10 @@ class Resistor_Class:
         evy = cy*15
         delta_x = evx - self.start_x
         delta_y = evy - self.start_y
-        self.canvas.move(self.body, delta_x, delta_y)
+        self.canvas.move(self.body1, delta_x, delta_y)
+        self.canvas.move(self.body2, delta_x, delta_y)
+        self.canvas.move(self.body3, delta_x, delta_y)
+        self.canvas.move(self.body4, delta_x, delta_y)
         self.start_x = evx
         self.start_y = evy
 
@@ -453,50 +526,79 @@ class Resistor_Class:
         color_menu.add_command(label="yellow", command=lambda: self.change_color("yellow"))
         menu.add_cascade(label="color", menu=color_menu)
         menu.add_command(label="value", command=self.change_value)
-        menu.add_command(label="rotate", command=self.rotate_resistor_right)
-        menu.add_command(label="delete", command=self.delete_combo)
+        menu.add_command(label="rotate", command=self.rotate_acpower_right)
+        menu.add_command(label="delete", command=self.delete_ac)
         menu.post(event.x_root, event.y_root)
 
     def change_color(self, new_color):
             self.color = new_color
-            self.canvas.itemconfig(self.body, fill=self.color)
+            self.canvas.itemconfig(self.body1, fill=self.color)
+            self.canvas.itemconfig(self.body2, outline=self.color)
+            self.canvas.itemconfig(self.body3, fill=self.color)
+            self.canvas.itemconfig(self.body4, fill=self.color)
 
     def change_value(self):
         new_value = simpledialog.askstring("تغيير اسم الكرة", "الرجاء إدخال اسم جديد:", initialvalue=self.value)
         if new_value:
             self.value = new_value
 
-    def rotate_resistor_right(self):
-        a,A,b,B,c,C,d,D,e,E,f,F,g,G,h,H,i,I,j,J = self.canvas.coords(self.body)
-        new_coords = [j,J-90,j,J-75,j-10,J-70,j+10,J-60,j-10,J-50,j+10,J-40,j-10,J-30,j+10,J-20,j,J-15,j,J]
-
-        self.canvas.coords(self.body, *new_coords)
+    def rotate_acpower_right(self):
+        a,b,c,d = self.canvas.coords(self.body4)
+        n1=[c,d-90,c,d-75]
+        n2=[c-30,d-75,c+30,d-15]
+        n3=[c,d-65,c+20,d-55,c,d-45,c-20,d-35,c,d-25]
+        n4=[c,d-15,c,d]
+        self.canvas.coords(self.body1, n1)
+        self.canvas.coords(self.body2, n2)
+        self.canvas.coords(self.body3, n3)
+        self.canvas.coords(self.body4, n4)
         
 
-    def delete_combo(self):
-        self.canvas.delete(self.body)
-'''
+    def delete_ac(self):
+        self.canvas.delete(self.body1)
+        self.canvas.delete(self.body2)
+        self.canvas.delete(self.body3)
+        self.canvas.delete(self.body4)
+
 #################################################################################################################################################
-'''
-class Resistor_Class:
+
+class Ground_Class:
     def __init__(self, canvas):
         self.canvas = canvas
-        x = 90
-        y = 120
-        self.points = [x, y, x+15, y, x+20, y+10, x+30, y-10, x+40, y+10, x+50, y-10, x+60, y+10, x+70,y-10 , x+75, y, x+90, y]
-        self.body = None
-        self.value = "10"
+        self.x = 150
+        self.y = 120
+        self.points1 = [self.x,self.y-30,self.x,self.y]
+        self.points2 = [self.x-30,self.y,self.x+30,self.y]
+        self.points3 = [self.x-20,self.y+7.5,self.x+20,self.y+7.5]
+        self.points4 = [self.x-10,self.y+15,self.x+10,self.y+15]
+        self.body1 = None
+        self.body2 = None
+        self.body3 = None
+        self.body4 = None
+        self.value = "0"
         self.color = None
 
-        self.draw_resistor()
+        self.draw_ground()
         
         # ربط حدث النقر والسحب
-        self.canvas.tag_bind(self.body, "<ButtonPress-1>", self.on_press)
-        self.canvas.tag_bind(self.body, "<B1-Motion>", self.on_drag)
-        self.canvas.tag_bind(self.body, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body1, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body1, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body1, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body2, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body2, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body2, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body3, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body3, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body3, "<Button-3>", self.show_context_menu)
+        self.canvas.tag_bind(self.body4, "<ButtonPress-1>", self.on_press)
+        self.canvas.tag_bind(self.body4, "<B1-Motion>", self.on_drag)
+        self.canvas.tag_bind(self.body4, "<Button-3>", self.show_context_menu)
 
-    def draw_resistor(self):
-        self.body = self.canvas.create_line(self.points, smooth="false", width=3, fill=self.color, tags="resistor")
+    def draw_ground(self):
+        self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="g1")
+        self.body2 = self.canvas.create_line(self.points2, smooth="false", width=3, fill=self.color, tags="g2")
+        self.body3 = self.canvas.create_line(self.points3, smooth="false", width=3, fill=self.color, tags="g3")
+        self.body4 = self.canvas.create_line(self.points4, smooth="false", width=3, fill=self.color, tags="g4")
 
     def on_press(self, event):
         # حفظ موقع بداية السحب
@@ -525,7 +627,10 @@ class Resistor_Class:
         evy = cy*15
         delta_x = evx - self.start_x
         delta_y = evy - self.start_y
-        self.canvas.move(self.body, delta_x, delta_y)
+        self.canvas.move(self.body1, delta_x, delta_y)
+        self.canvas.move(self.body2, delta_x, delta_y)
+        self.canvas.move(self.body3, delta_x, delta_y)
+        self.canvas.move(self.body4, delta_x, delta_y)
         self.start_x = evx
         self.start_y = evy
 
@@ -536,30 +641,37 @@ class Resistor_Class:
         color_menu.add_command(label="red", command=lambda: self.change_color("red"))
         color_menu.add_command(label="yellow", command=lambda: self.change_color("yellow"))
         menu.add_cascade(label="color", menu=color_menu)
-        menu.add_command(label="value", command=self.change_value)
-        menu.add_command(label="rotate", command=self.rotate_resistor_right)
-        menu.add_command(label="delete", command=self.delete_combo)
+        menu.add_command(label="rotate", command=self.rotate_ground_right)
+        menu.add_command(label="delete", command=self.delete_ground)
         menu.post(event.x_root, event.y_root)
 
     def change_color(self, new_color):
             self.color = new_color
-            self.canvas.itemconfig(self.body, fill=self.color)
+            self.canvas.itemconfig(self.body1, fill=self.color)
+            self.canvas.itemconfig(self.body2, fill=self.color)
+            self.canvas.itemconfig(self.body3, fill=self.color)
+            self.canvas.itemconfig(self.body4, fill=self.color)
 
-    def change_value(self):
-        new_value = simpledialog.askstring("تغيير اسم الكرة", "الرجاء إدخال اسم جديد:", initialvalue=self.value)
-        if new_value:
-            self.value = new_value
-
-    def rotate_resistor_right(self):
-        a,A,b,B,c,C,d,D,e,E,f,F,g,G,h,H,i,I,j,J = self.canvas.coords(self.body)
-        new_coords = [j,J-90,j,J-75,j-10,J-70,j+10,J-60,j-10,J-50,j+10,J-40,j-10,J-30,j+10,J-20,j,J-15,j,J]
-
-        self.canvas.coords(self.body, *new_coords)
+    def rotate_ground_right(self):
+        a,b,c,d = self.canvas.coords(self.body4)
+        e = a + 10
+        f = b
+        n1 = [e+15,f,e+45,f]
+        n2 = [e+15,f-30,e+15,f+30]
+        n3 = [e+7.5,f-20,e+7.5,f+20]
+        n4 = [e,f-10,e,f+10]
+        self.canvas.coords(self.body1, n1)
+        self.canvas.coords(self.body2, n2)
+        self.canvas.coords(self.body3, n3)
+        self.canvas.coords(self.body4, n4)
         
 
-    def delete_combo(self):
-        self.canvas.delete(self.body)
-'''
+    def delete_ground(self):
+        self.canvas.delete(self.body1)
+        self.canvas.delete(self.body2)
+        self.canvas.delete(self.body3)
+        self.canvas.delete(self.body4)
+
 #################################################################################################################################################
 ########################################################--------the wire------------
 class Wire_Class:
@@ -759,6 +871,15 @@ def add_inductance(inductance_list):
 def add_wire(wire_list):
     wire_list.append(Wire_Class(canvas))
 
+def add_acpower(acpower_list):
+    acpower_list.append(AC_Power_Class(canvas))
+
+def add_dcpower(dcpower_list):
+    dcpower_list.append(DC_Power_Class(canvas))
+
+def add_ground(ground_list):
+    ground_list.append(Ground_Class(canvas))
+
 #################################################################################################################################################
 #################################################################################################################################################
 
@@ -775,6 +896,10 @@ resistor_list = []
 capacitor_list = []
 inductance_list = []
 wire_list = []
+dcpower_list = []
+acpower_list = []
+ground_list = []
+
 global z
 z = 0
 
@@ -786,10 +911,10 @@ tools_menu.add_command(label="Resistor", command=lambda: add_resistor(resistor_l
 tools_menu.add_command(label="Capacitor", command=lambda: add_capacitor(capacitor_list))
 tools_menu.add_command(label="Inductance", command=lambda: add_inductance(inductance_list))
 tools_menu.add_separator()
-tools_menu.add_command(label="DC_power", command=lambda: Resistor_Class(canvas))
-tools_menu.add_command(label="AC_power", command=lambda: Resistor_Class(canvas))
+tools_menu.add_command(label="DC_power", command=lambda: add_dcpower(dcpower_list))
+tools_menu.add_command(label="AC_power", command=lambda: add_acpower(acpower_list))
 tools_menu.add_separator()
-tools_menu.add_command(label="Ground", command=lambda: Resistor_Class(canvas))
+tools_menu.add_command(label="Ground", command=lambda: add_ground(ground_list))
 tools_menu.add_separator()
 tools_menu.add_command(label="Wire", command=lambda: add_wire(wire_list))
 
