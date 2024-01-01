@@ -2,6 +2,11 @@
 
 import tkinter as tk
 from tkinter import simpledialog
+import PySpice.Logging.Logging as Logging
+import numpy as np
+logger = Logging.setup_logging()
+from PySpice.Spice.Netlist import Circuit
+from PySpice.Unit import u_Ohm, u_V, u_A, u_F, u_H, u_W
 
 #################################################################################################################################################
 
@@ -14,13 +19,23 @@ class Resistor_Class:
         self.body = None
         self.value = "10"
         self.color = None
+        self.index = index_list[0]
+        index_list[0]+=1
+        self.left=None
+        self.right=None
 
         self.draw_resistor()
+        self.coords()
         
         # ربط حدث النقر والسحب
         self.canvas.tag_bind(self.body, "<ButtonPress-1>", self.on_press)
         self.canvas.tag_bind(self.body, "<B1-Motion>", self.on_drag)
         self.canvas.tag_bind(self.body, "<Button-3>", self.show_context_menu)
+
+    def coords(self):
+        a,A,b,B,c,C,d,D,e,E,f,F,g,G,h,H,i,I,j,J = self.canvas.coords(self.body)
+        self.left = (a,A)
+        self.right= (j,J)
 
     def draw_resistor(self):
         self.body = self.canvas.create_line(self.points, smooth="false", width=3, fill=self.color, tags="resistor")
@@ -86,6 +101,7 @@ class Resistor_Class:
 
     def delete_combo(self):
         self.canvas.delete(self.body)
+        resistor_list[self.index]=0
 
 #################################################################################################################################################
 
@@ -100,8 +116,13 @@ class Capacitor_Class:
         self.body_l = None
         self.value = "10"
         self.color = None
+        self.index = index_list[1]
+        index_list[1]+=1
+        self.left=None
+        self.right=None
 
         self.draw_capacitor()
+        self.coords()
         
         # ربط حدث النقر والسحب
         self.canvas.tag_bind(self.body_r, "<ButtonPress-1>", self.on_press)
@@ -110,6 +131,12 @@ class Capacitor_Class:
         self.canvas.tag_bind(self.body_l, "<ButtonPress-1>", self.on_press)
         self.canvas.tag_bind(self.body_l, "<B1-Motion>", self.on_drag)
         self.canvas.tag_bind(self.body_l, "<Button-3>", self.show_context_menu)
+
+    def coords(self):
+        a,A,b,B,c,C,d,D = self.canvas.coords(self.body_r)
+        e,E,f,F,g,G,h,H = self.canvas.coords(self.body_l) 
+        self.left = (a,A)
+        self.right= (h,H)
 
     def draw_capacitor(self):
         self.body_r = self.canvas.create_line(self.points_r, smooth="false", width=3, fill=self.color, tags="capacitor_r")
@@ -181,6 +208,7 @@ class Capacitor_Class:
     def delete_combo(self):
         self.canvas.delete(self.body_r)
         self.canvas.delete(self.body_l)
+        capacitor_list[self.index]=0
 
 #################################################################################################################################################
 
@@ -195,12 +223,17 @@ class Inductance_Class:
         self.body4 = None
         self.body5 = None
         self.body6 = None
+        self.left=None
+        self.right=None
         self.points1 = [self.x,self.y, self.x+15, self.y]
         self.points2 = [self.x+75, self.y, self.x+90, self.y]
         self.value = "10"
         self.color = None
+        self.index = index_list[2]
+        index_list[2]+=1
 
         self.draw_Inductance()
+        self.coords()
         
         # ربط حدث النقر والسحب
         self.canvas.tag_bind(self.body1, "<ButtonPress-1>", self.on_press)
@@ -219,6 +252,12 @@ class Inductance_Class:
         self.canvas.tag_bind(self.body5, "<B1-Motion>", self.on_drag)
         self.canvas.tag_bind(self.body5, "<Button-3>", self.show_context_menu)
 
+    def coords(self):
+        a,b,c,d = self.canvas.coords(self.body1)
+        e,f,g,h = self.canvas.coords(self.body5)
+        self.left = (a,b)
+        self.right= (g,h)
+    
     def draw_Inductance(self):
         self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="inductance1")
         self.body2 = self.canvas.create_oval(self.x+15, self.y-12, self.x+39, self.y+12, outline=self.color, width=3, tags="inductance2")
@@ -307,6 +346,7 @@ class Inductance_Class:
         self.canvas.delete(self.body3)
         self.canvas.delete(self.body4)
         self.canvas.delete(self.body5)
+        inductance_list[self.index]=0
 
 #################################################################################################################################################
         
@@ -326,10 +366,15 @@ class DC_Power_Class:
         self.body4 = None
         self.body5 = None
         self.body6 = None
+        self.left=None
+        self.right=None
         self.value = "10"
         self.color = None
+        self.index = index_list[3]
+        index_list[3]+=1
 
         self.draw_dc()
+        self.coords()
         
         # ربط حدث النقر والسحب
         self.canvas.tag_bind(self.body1, "<ButtonPress-1>", self.on_press)
@@ -351,6 +396,12 @@ class DC_Power_Class:
         self.canvas.tag_bind(self.body6, "<B1-Motion>", self.on_drag)
         self.canvas.tag_bind(self.body6, "<Button-3>", self.show_context_menu)
 
+    def coords(self):
+        a,b,c,d = self.canvas.coords(self.body1)
+        e,f,g,h = self.canvas.coords(self.body6)
+        self.left = (a,b)
+        self.right= (g,h)
+    
     def draw_dc(self):
         self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="dc1")
         self.body2 = self.canvas.create_oval(self.x+15, self.y-30, self.x+75, self.y+30, outline=self.color, width=3, tags="dc2")
@@ -444,6 +495,7 @@ class DC_Power_Class:
         self.canvas.delete(self.body4)
         self.canvas.delete(self.body5)
         self.canvas.delete(self.body6)
+        dcpower_list[self.index]=0
 
 #################################################################################################################################################
         
@@ -461,8 +513,13 @@ class AC_Power_Class:
         self.body4 = None
         self.value = "10"
         self.color = None
+        self.left=None
+        self.right=None
+        self.index = index_list[4]
+        index_list[4]+=1
 
         self.draw_ac()
+        self.coords()
         
         # ربط حدث النقر والسحب
         self.canvas.tag_bind(self.body1, "<ButtonPress-1>", self.on_press)
@@ -478,11 +535,17 @@ class AC_Power_Class:
         self.canvas.tag_bind(self.body4, "<B1-Motion>", self.on_drag)
         self.canvas.tag_bind(self.body4, "<Button-3>", self.show_context_menu)
 
+    def coords(self):
+        a,b,c,d = self.canvas.coords(self.body1)
+        e,f,g,h = self.canvas.coords(self.body4)
+        self.left = (a,b)
+        self.right= (g,h)
+    
     def draw_ac(self):
         self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="ac1")
         self.body2 = self.canvas.create_oval(self.x+15, self.y-30, self.x+75, self.y+30, outline=self.color, width=3, tags="ac2")
-        self.body3 = self.canvas.create_line(self.points2, smooth="true", width=3, fill=self.color, tags="ac5")
-        self.body4 = self.canvas.create_line(self.points3, smooth="false", width=3, fill=self.color, tags="ac5")
+        self.body3 = self.canvas.create_line(self.points2, smooth="true", width=3, fill=self.color, tags="ac3")
+        self.body4 = self.canvas.create_line(self.points3, smooth="false", width=3, fill=self.color, tags="ac4")
 
     def on_press(self, event):
         # حفظ موقع بداية السحب
@@ -559,6 +622,7 @@ class AC_Power_Class:
         self.canvas.delete(self.body2)
         self.canvas.delete(self.body3)
         self.canvas.delete(self.body4)
+        acpower_list[self.index]=0
 
 #################################################################################################################################################
 
@@ -575,10 +639,15 @@ class Ground_Class:
         self.body2 = None
         self.body3 = None
         self.body4 = None
+        self.point = None
         self.value = "0"
         self.color = None
+        self.index = index_list[5]
+        index_list[5]+=1
 
         self.draw_ground()
+        self.coords()
+
         
         # ربط حدث النقر والسحب
         self.canvas.tag_bind(self.body1, "<ButtonPress-1>", self.on_press)
@@ -594,6 +663,10 @@ class Ground_Class:
         self.canvas.tag_bind(self.body4, "<B1-Motion>", self.on_drag)
         self.canvas.tag_bind(self.body4, "<Button-3>", self.show_context_menu)
 
+    def coords(self):
+        a,b,c,d = self.canvas.coords(self.body1)
+        self.point = (a,b)
+    
     def draw_ground(self):
         self.body1 = self.canvas.create_line(self.points1, smooth="false", width=3, fill=self.color, tags="g1")
         self.body2 = self.canvas.create_line(self.points2, smooth="false", width=3, fill=self.color, tags="g2")
@@ -671,6 +744,7 @@ class Ground_Class:
         self.canvas.delete(self.body2)
         self.canvas.delete(self.body3)
         self.canvas.delete(self.body4)
+        ground_list[self.index]=0
 
 #################################################################################################################################################
 ########################################################--------the wire------------
@@ -684,6 +758,9 @@ class Wire_Class:
         self.color = None
         self.pin = 0
         self.bin = 0
+        self.index = index_list[6]
+        index_list[6]+=1
+        self.name = str(self.index)
         global z
         
         canvas.bind("<Double-Button-1>", self.get_index)
@@ -790,9 +867,12 @@ class Wire_Class:
             self.canvas.move(f"wire{self.z[i]}", delta_x, delta_y)
             a,b,c,d=self.canvas.coords(self.body[i])
             if(i==0):
-                e,f,g,h=self.canvas.coords(self.body[i+1])
-                self.canvas.coords(self.body[i+1], c,d,g,h)
-                self.canvas.coords(self.body[i], a+x,b,c,d)
+                if(len(self.body)==1):
+                    self.canvas.coords(self.body[i], a+x,b,c-x,d)
+                else:
+                    e,f,g,h=self.canvas.coords(self.body[i+1])
+                    self.canvas.coords(self.body[i+1], c,d,g,h)
+                    self.canvas.coords(self.body[i], a+x,b,c,d)
 
             elif(i==len(self.body)-1):
                 e,f,g,h=self.canvas.coords(self.body[i-1])
@@ -808,9 +888,12 @@ class Wire_Class:
             self.canvas.move(f"wire{self.z[i]}", delta_x, delta_y)
             a,b,c,d=self.canvas.coords(self.body[i])
             if(i==0):
-                e,f,g,h=self.canvas.coords(self.body[i+1])
-                self.canvas.coords(self.body[i+1], c,d,g,h)
-                self.canvas.coords(self.body[i], a,b+y,c,d)
+                if(len(self.body)==1):
+                    self.canvas.coords(self.body[i], a,b+y,c,d-y)
+                else:
+                    e,f,g,h=self.canvas.coords(self.body[i+1])
+                    self.canvas.coords(self.body[i+1], c,d,g,h)
+                    self.canvas.coords(self.body[i], a,b+y,c,d)
             elif(i==len(self.body)-1):
                 e,f,g,h=self.canvas.coords(self.body[i-1])
                 self.canvas.coords(self.body[i-1], e,f,a,b)
@@ -846,6 +929,7 @@ class Wire_Class:
         global z
         for a in range(0, len(self.body)):
             self.canvas.delete(f"wire{self.z[a]}")
+        wire_list[self.index]=0
 #################################################################################################################################################
 
 def draw_grid(canvas, width, height, spacing):
@@ -879,6 +963,143 @@ def add_dcpower(dcpower_list):
 
 def add_ground(ground_list):
     ground_list.append(Ground_Class(canvas))
+#################################################################################################################################################
+    
+def run():
+    global resistor_list
+    global capacitor_list
+    global inductance_list
+    global wire_list
+    global dcpower_list
+    global acpower_list
+    global ground_list
+    global p_l
+    global allp
+    global p_w
+    global points_list
+    global index_list
+    global pp
+    global ccc
+    global neg
+    global lastl
+    global f_d
+    global final_list
+    global circuit
+    points_list=[]
+    final_list = []
+    for i in range (0, len(wire_list)):
+        points = []
+        if (len(wire_list[i].body)==0):
+            wire_list[i]==0
+        if (wire_list[i] is not None) and (wire_list[i] != 0):
+            for a in range (0, len(wire_list[i].body)):
+                w,x,y,z=wire_list[i].canvas.coords(wire_list[i].body[a])
+                if wire_list[i].m[a] == 0:  # أفقي
+                    for b in range (int(min(w,y)), int(max(w,y)+1), 15):
+                        v = (b, int(x))
+                        if points.count(v) == 0:
+                            points.append(v)
+                            p_w[v] = []
+                        if allp.count(v) == 0:
+                            allp.append(v)
+                else:  # رأسي
+                    for b in range (int(min(x,z)), int(max(x,z)+1), 15):
+                        v = (int(w), b)
+                        if points.count(v) == 0:
+                            points.append(v)
+                            p_w[v] = []
+                        if allp.count(v) == 0:
+                            allp.append(v)
+        if points != []:
+            if(p_l.count(points)==0):
+                p_l.append(points)
+
+    # الجزء الباقي من الكود يظل كما هو
+    for i in range (0, len(p_l)):
+        for a in range (0, len(p_l[i])):
+            if p_w[p_l[i][a]] == []:
+                p_w[p_l[i][a]].append(i)
+            else:
+                if p_w[p_l[i][a]].count(i) == 0:
+                    p_w[p_l[i][a]].append(i)
+    pp=[]
+    neg=[]
+    ccc = 0
+    lastl=0
+    for i in range(0, len(p_l)):
+        if(pp.count(i)==0):
+            if(len(pp)==0):
+                pp.append(i)
+            else:
+                points_list.append(pp)
+                pp=[]
+                pp.append(i)
+        def goto():
+            global resistor_list
+            global capacitor_list
+            global inductance_list
+            global wire_list
+            global dcpower_list
+            global acpower_list
+            global ground_list
+            global p_l
+            global allp
+            global p_w
+            global points_list
+            global index_list
+            global pp
+            global ccc
+            global neg
+            global lastl
+            global z
+            for a in range (0,len(allp)):
+                for b in range (0, len(p_w[allp[a]])):
+                    if(pp.count(p_w[allp[a]][b])!=0):
+                        for c in range (0, len(p_w[allp[a]])):
+                            if(pp.count(p_w[allp[a]][c])==0):
+                                pp.append(p_w[allp[a]][c])
+                    else:
+                        ccc += 1
+                        if(ccc==len(p_w[allp[a]])):
+                            neg.append(a)
+        goto()
+        while (len(neg)>0):
+            lastl=len(neg)
+            neg=[]
+            goto()
+            if(lastl==len(neg)):
+                break
+
+    points_list.append(pp)
+    for i in range(0, len(points_list)):
+        rr=[]
+        for a in range (0, len(points_list[i])):
+            for b in range (0, len(p_l[points_list[i][a]])):
+                if(rr.count(p_l[points_list[i][a]][b])==0):
+                    rr.append(p_l[points_list[i][a]][b])
+        final_list.append(rr)
+    
+    for i in range (0,len(final_list)):
+        for a in range (0, len(final_list[i])):
+            f_d[final_list[i][a]]=i
+    #print(final_list)
+    #print(f_d)
+#############################################################---------------------second_part
+    for i in range(0, len(resistor_list)):
+        a=resistor_list[i].left
+        b=resistor_list[i].right
+        circuit.R(i,0 , 1, int(resistor_list[i].value)@u_Ohm)
+    for i in range(0, len(dcpower_list)):
+        a=dcpower_list[i].left
+        b=dcpower_list[i].right
+        circuit.V(i,0 , 1, int(dcpower_list[i].value)@u_V)
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    analysis = simulator.operating_point()
+    for node in analysis.nodes.values():
+        print('Node {}: {:4.1f} V'.format(str(node), float(np.squeeze(node))))
+
+    for branch in analysis.branches.values():
+        print('Branch {}: {:5.2f} A'.format(str(branch), float(np.squeeze(branch))))
 
 #################################################################################################################################################
 #################################################################################################################################################
@@ -892,21 +1113,51 @@ canvas.pack()
 
 draw_grid(canvas, 1530, 780, 15)
 
+global resistor_list
+global capacitor_list
+global inductance_list
+global wire_list
+global dcpower_list
+global acpower_list
+global ground_list
+global p_l
+global allp
+global p_w
+global points_list
+global final_list
+global f_d
+global index_list
+global pp
+global ccc
+global neg
+global lastl
+global z
+global circuit
+circuit= Circuit('Circuit with CCVS')
+
+
 resistor_list = []
-capacitor_list = []
-inductance_list = []
+capacitor_list= []
+inductance_list= []
 wire_list = []
 dcpower_list = []
 acpower_list = []
 ground_list = []
-
-global z
+final_list = []
+f_d = {}
+p_l = []
+allp = []
+p_w = {}
+points_list = []
+index_list = [0,0,0,0,0,0,0]
 z = 0
 
 menu_bar = tk.Menu(root)
 
 # إعداد قائمة الملف
 tools_menu = tk.Menu(menu_bar, tearoff=0)
+run_menu = tk.Menu(menu_bar, tearoff=0)
+
 tools_menu.add_command(label="Resistor", command=lambda: add_resistor(resistor_list))
 tools_menu.add_command(label="Capacitor", command=lambda: add_capacitor(capacitor_list))
 tools_menu.add_command(label="Inductance", command=lambda: add_inductance(inductance_list))
@@ -918,8 +1169,11 @@ tools_menu.add_command(label="Ground", command=lambda: add_ground(ground_list))
 tools_menu.add_separator()
 tools_menu.add_command(label="Wire", command=lambda: add_wire(wire_list))
 
+run_menu.add_command(label="Run", command=lambda: run())
+
 # إضافة قائمة الملف إلى شريط القائمة
 menu_bar.add_cascade(label="tools", menu=tools_menu)
+menu_bar.add_cascade(label="run", menu=run_menu)
 
 # إعداد نافذة البرنامج
 root.config(menu=menu_bar)
