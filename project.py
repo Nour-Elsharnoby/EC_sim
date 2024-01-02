@@ -145,7 +145,7 @@ class Resistor_Class:
             self.canvas.itemconfig(self.body, fill=self.color)
 
     def change_value(self):
-        new_value = simpledialog.askstring("تغيير اسم الكرة", "الرجاء إدخال اسم جديد:", initialvalue=self.value)
+        new_value = simpledialog.askstring("resistor value", "please enter the value", initialvalue=self.value)
         if new_value:
             self.value = new_value
 
