@@ -6,7 +6,16 @@ import PySpice.Logging.Logging as Logging
 import numpy as np
 logger = Logging.setup_logging()
 from PySpice.Spice.Netlist import Circuit
-from PySpice.Unit import u_Ohm, u_V, u_A, u_F, u_H, u_W
+from PySpice.Unit import u_Ohm, u_V, u_A, u_nF, u_mH, u_W, u_kHz, u_us
+import math
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Cursor
+from matplotlib.pyplot import semilogx
+from matplotlib import pyplot
+from PySpice.Doc.ExampleTools import find_libraries
+from PySpice.Spice.Library import SpiceLibrary
+from engineering_notation import EngNumber
+from matplotlib.ticker import EngFormatter
 
 #################################################################################################################################################
 
@@ -512,6 +521,7 @@ class AC_Power_Class:
         self.body3 = None
         self.body4 = None
         self.value = "10"
+        self.hz = 0.06
         self.color = None
         self.left=None
         self.right=None
@@ -589,6 +599,7 @@ class AC_Power_Class:
         color_menu.add_command(label="yellow", command=lambda: self.change_color("yellow"))
         menu.add_cascade(label="color", menu=color_menu)
         menu.add_command(label="value", command=self.change_value)
+        menu.add_command(label="frequency", command=self.change_hz)
         menu.add_command(label="rotate", command=self.rotate_acpower_right)
         menu.add_command(label="delete", command=self.delete_ac)
         menu.post(event.x_root, event.y_root)
@@ -604,6 +615,11 @@ class AC_Power_Class:
         new_value = simpledialog.askstring("تغيير اسم الكرة", "الرجاء إدخال اسم جديد:", initialvalue=self.value)
         if new_value:
             self.value = new_value
+
+    def change_hz(self):
+        new_value = simpledialog.askfloat("تغيير اسم الكرة", "الرجاء إدخال اسم جديد:", initialvalue=self.hz)
+        if new_value:
+            self.hz = new_value
 
     def rotate_acpower_right(self):
         a,b,c,d = self.canvas.coords(self.body4)
@@ -983,13 +999,23 @@ def run():
     global neg
     global lastl
     global f_d
+    global v_l
     global final_list
     global circuit
+    global flag
+    global dc
+    global ac
+    v_l = {}
+    dc = False
+    ac = False
+    flag = False
+    circuit= Circuit('Circuit with CCVS')
     points_list=[]
     final_list = []
+    f_d = {}
     for i in range (0, len(wire_list)):
         points = []
-        if (len(wire_list[i].body)==0):
+        if (wire_list[i]!=0)and(len(wire_list[i].body)==0):
             wire_list[i]==0
         if (wire_list[i] is not None) and (wire_list[i] != 0):
             for a in range (0, len(wire_list[i].body)):
@@ -1052,6 +1078,8 @@ def run():
             global neg
             global lastl
             global z
+            global flag
+            flag = False
             for a in range (0,len(allp)):
                 for b in range (0, len(p_w[allp[a]])):
                     if(pp.count(p_w[allp[a]][b])!=0):
@@ -1085,23 +1113,117 @@ def run():
     #print(final_list)
     #print(f_d)
 #############################################################---------------------second_part
-    for i in range(0, len(resistor_list)):
-        a=resistor_list[i].left
-        b=resistor_list[i].right
-        circuit.R(i,0 , 1, int(resistor_list[i].value)@u_Ohm)
+    #print(f_d)
+            
     for i in range(0, len(dcpower_list)):
-        a=dcpower_list[i].left
-        b=dcpower_list[i].right
-        circuit.V(i,0 , 1, int(dcpower_list[i].value)@u_V)
-    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
-    analysis = simulator.operating_point()
-    for node in analysis.nodes.values():
-        print('Node {}: {:4.1f} V'.format(str(node), float(np.squeeze(node))))
+        if(dcpower_list[i]!=0):
+            dcpower_list[i].coords()
+            a=dcpower_list[i].left
+            b=dcpower_list[i].right
+            #print(a, b)
+            if(f_d[b]!=f_d[a]):
+                circuit.V(i,f_d[b] , f_d[a], int(dcpower_list[i].value)@u_V)
+                flag = True
+                dc = True
+            else:
+                print("Error: voltage source has the same two point")
 
-    for branch in analysis.branches.values():
-        print('Branch {}: {:5.2f} A'.format(str(branch), float(np.squeeze(branch))))
+    for i in range(0, len(acpower_list)):
+        if(acpower_list[i]!=0):
+            acpower_list[i].coords()
+            a=acpower_list[i].left
+            b=acpower_list[i].right
+            if(f_d[b]!=f_d[a]):
+                circuit.SinusoidalVoltageSource(1, b, a,amplitude=int(acpower_list[i].value)@u_V, frequency = 5@u_kHz, offset= 0, delay = 0, damping_factor =0)
+                flag = True
+                ac = True
+            else:
+                print("Error: voltage source has the same two point")
+
+    if(flag):
+        for i in range(0, len(resistor_list)):
+            if(resistor_list[i]!=0):
+                resistor_list[i].coords()
+                a=resistor_list[i].left
+                b=resistor_list[i].right
+                #print(a, b)
+                circuit.R(i, f_d[b] , f_d[a], int(resistor_list[i].value)@u_Ohm)
+
+        for i in range(0, len(capacitor_list)):
+            if(capacitor_list[i]!=0):
+                capacitor_list[i].coords()
+                a=capacitor_list[i].left
+                b=capacitor_list[i].right
+                #print(a, b)
+                circuit.C(i, f_d[b] , f_d[a], int(capacitor_list[i].value)@u_nF)
+
+        for i in range(0, len(inductance_list)):
+            if(inductance_list[i]!=0):
+                inductance_list[i].coords()
+                a=inductance_list[i].left
+                b=inductance_list[i].right
+                #print(a, b)
+                circuit.L(i, f_d[b] , f_d[a], int(inductance_list[i].value)@u_mH)
+
+        for i in range(0, len(ground_list)):
+            if(ground_list[i]!=0):
+                ground_list[i].coords()
+                a=ground_list[i].point
+                #print(a)
+                
+
+        simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+        if (dc):
+            analysis = simulator.operating_point()
+        elif (ac):
+            analysis = simulator.transient(step_time=0.1@u_us, end_time=5*(1/(5@u_kHz)))
+            time=np.array(analysis.time)
+
+        v_l[0]=float(0)
+        for node in analysis.nodes.values():
+            print('Node {}: {:4.1f} V'.format(str(node), float(np.squeeze(node))))
+            s =str(node)
+            v_l[int(s)]=(float(np.squeeze(node)))
+
+        #print(v_l[f_d[(15,15)]])
+            
+        #print(v_l)
+
+        for branch in analysis.branches.values():
+            print('Branch {}: {:5.2f} A'.format(str(branch), float(np.squeeze(branch))))
 
 #################################################################################################################################################
+            
+class voltage_value:
+    def __init__(self,event,canvas):
+        dex=event.x
+        cx=dex//15
+        dey=event.y
+        cy=dey//15
+        if(dex%15>7):
+            cx=cx+1
+        if(dey%15>7):
+            cy=cy+1
+        self.x = cx*15
+        self.y = cy*15
+        self.canvas = canvas
+        self.label = None
+        lable_list.append(self)
+        print((self.x, self.y))
+
+        if (self.x, self.y) in f_d :
+            a=v_l[f_d[(self.x, self.y)]]
+            self.label=tk.Label(canvas,text=f"{a}",bg="blue",fg="cyan",font=("araial",14))
+            self.label.place(x=event.x,y=event.y)
+
+        if self.label is not None:
+                self.label.bind("<Button-3>", lambda event: self.del_label())
+
+    def del_label(self):
+        #self.canvas.delete(self.label)
+        self.label.destroy()
+        lable_list.remove(self)
+
 #################################################################################################################################################
 
 root = tk.Tk()
@@ -1114,6 +1236,7 @@ canvas.pack()
 draw_grid(canvas, 1530, 780, 15)
 
 global resistor_list
+global lable_list
 global capacitor_list
 global inductance_list
 global wire_list
@@ -1129,14 +1252,19 @@ global f_d
 global index_list
 global pp
 global ccc
+global dc
+global ac
 global neg
 global lastl
 global z
 global circuit
-circuit= Circuit('Circuit with CCVS')
+global flag
+global v_l
+
 
 
 resistor_list = []
+lable_list=[]
 capacitor_list= []
 inductance_list= []
 wire_list = []
@@ -1152,6 +1280,9 @@ points_list = []
 index_list = [0,0,0,0,0,0,0]
 z = 0
 
+def cc():
+    canvas.bind("<Double-Button-1>", lambda event, canvas=canvas: voltage_value(event,canvas))
+
 menu_bar = tk.Menu(root)
 
 # إعداد قائمة الملف
@@ -1163,17 +1294,21 @@ tools_menu.add_command(label="Capacitor", command=lambda: add_capacitor(capacito
 tools_menu.add_command(label="Inductance", command=lambda: add_inductance(inductance_list))
 tools_menu.add_separator()
 tools_menu.add_command(label="DC_power", command=lambda: add_dcpower(dcpower_list))
-tools_menu.add_command(label="AC_power", command=lambda: add_acpower(acpower_list))
+#tools_menu.add_command(label="AC_power", command=lambda: add_acpower(acpower_list))
 tools_menu.add_separator()
 tools_menu.add_command(label="Ground", command=lambda: add_ground(ground_list))
 tools_menu.add_separator()
 tools_menu.add_command(label="Wire", command=lambda: add_wire(wire_list))
 
 run_menu.add_command(label="Run", command=lambda: run())
+run_menu.add_separator()
+run_menu.add_command(label="Voltage", command=lambda: cc())
+run_menu.add_command(label="Current", command=lambda: run())
+run_menu.add_command(label="Power", command=lambda: run())
 
 # إضافة قائمة الملف إلى شريط القائمة
 menu_bar.add_cascade(label="tools", menu=tools_menu)
-menu_bar.add_cascade(label="run", menu=run_menu)
+menu_bar.add_cascade(label="Operations", menu=run_menu)
 
 # إعداد نافذة البرنامج
 root.config(menu=menu_bar)
