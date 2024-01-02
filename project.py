@@ -90,7 +90,55 @@ class Resistor_Class:
         menu.add_command(label="value", command=self.change_value)
         menu.add_command(label="rotate", command=self.rotate_resistor_right)
         menu.add_command(label="delete", command=self.delete_combo)
+        menu.add_command(label="view current", command=lambda event=event: self.view_current(event))
+        menu.add_command(label="view power", command=lambda event=event: self.view_power(event))
+
         menu.post(event.x_root, event.y_root)
+
+    def view_current(self,event):
+        self.label1 = None
+        lable_list.append(self.label1)
+        #print((self.x, self.y))
+
+        a=v_l[f_d[(self.right)]]
+        b=v_l[f_d[(self.left)]]
+        c=abs(a-b)
+        d=c/int(self.value)
+        self.label1=tk.Label(canvas,text=f"{d} A",bg="blue",fg="cyan",font=("araial",14))
+        w,v=self.right
+        self.label1.place(x=w-45,y=v-30)
+
+        if self.label1 is not None:
+                self.label1.bind("<Button-3>", lambda event=event: self.del_label())
+
+    def del_label(self):
+        #self.canvas.delete(self.label)
+        self.label1.destroy()
+        #lable_list.remove(self.label1)
+
+
+    def view_power(self, event):
+        self.label1 = None
+        lable_list.append(self.label1)
+        #print((self.x, self.y))
+
+        a=v_l[f_d[(self.right)]]
+        b=v_l[f_d[(self.left)]]
+        c=abs(a-b)
+        i=c/int(self.value)
+        p = i*i*int(self.value)
+        self.label1=tk.Label(canvas,text=f"{p} W",bg="blue",fg="cyan",font=("araial",14))
+        w,v=self.right
+        self.label1.place(x=w-45,y=v-30)
+
+        if self.label1 is not None:
+                self.label1.bind("<Button-3>", lambda event=event: self.del_label())
+
+    def del_label(self):
+        #self.canvas.delete(self.label)
+        self.label1.destroy()
+        #lable_list.remove(self.label1)
+
 
     def change_color(self, new_color):
             self.color = new_color
@@ -465,7 +513,26 @@ class DC_Power_Class:
         menu.add_command(label="value", command=self.change_value)
         menu.add_command(label="rotate", command=self.rotate_dcpower_right)
         menu.add_command(label="delete", command=self.delete_dc)
+        menu.add_command(label="view power", command=lambda event=event: self.view_power(event))
         menu.post(event.x_root, event.y_root)
+
+    def view_power(self, event):
+        self.label1 = None
+        lable_list.append(self.label1)
+        #print((self.x, self.y))
+
+        p = mx * int(self.value)
+        self.label1=tk.Label(canvas,text=f"{p} W",bg="blue",fg="cyan",font=("araial",14))
+        w,v=self.right
+        self.label1.place(x=w-45,y=v-30)
+
+        if self.label1 is not None:
+                self.label1.bind("<Button-3>", lambda event=event: self.del_label())
+
+    def del_label(self):
+        #self.canvas.delete(self.label)
+        self.label1.destroy()
+        #lable_list.remove(self.label1)
 
     def change_color(self, new_color):
             self.color = new_color
@@ -1004,6 +1071,7 @@ def run():
     global circuit
     global flag
     global dc
+    global mx
     global ac
     v_l = {}
     dc = False
@@ -1191,6 +1259,7 @@ def run():
 
         for branch in analysis.branches.values():
             print('Branch {}: {:5.2f} A'.format(str(branch), float(np.squeeze(branch))))
+            mx=max(mx,abs(float(np.squeeze(branch))))
 
 #################################################################################################################################################
             
@@ -1209,11 +1278,11 @@ class voltage_value:
         self.canvas = canvas
         self.label = None
         lable_list.append(self)
-        print((self.x, self.y))
+        #print((self.x, self.y))
 
         if (self.x, self.y) in f_d :
             a=v_l[f_d[(self.x, self.y)]]
-            self.label=tk.Label(canvas,text=f"{a}",bg="blue",fg="cyan",font=("araial",14))
+            self.label=tk.Label(canvas,text=f"{a} V",bg="blue",fg="cyan",font=("araial",14))
             self.label.place(x=event.x,y=event.y)
 
         if self.label is not None:
@@ -1227,8 +1296,9 @@ class voltage_value:
 #################################################################################################################################################
 
 root = tk.Tk()
-root.title("FullScreen Tkinter App")
+root.title("ECSIM")
 root.geometry("{0}x{1}+450+200".format(600, 400))
+root.iconbitmap("project.ico")
 
 canvas = tk.Canvas(root, width=1530, height=780, bg="#FFFAFA")#the color is snow
 canvas.pack()
@@ -1256,6 +1326,7 @@ global dc
 global ac
 global neg
 global lastl
+global mx
 global z
 global circuit
 global flag
@@ -1279,6 +1350,7 @@ p_w = {}
 points_list = []
 index_list = [0,0,0,0,0,0,0]
 z = 0
+mx = float(0)
 
 def cc():
     canvas.bind("<Double-Button-1>", lambda event, canvas=canvas: voltage_value(event,canvas))
@@ -1303,8 +1375,8 @@ tools_menu.add_command(label="Wire", command=lambda: add_wire(wire_list))
 run_menu.add_command(label="Run", command=lambda: run())
 run_menu.add_separator()
 run_menu.add_command(label="Voltage", command=lambda: cc())
-run_menu.add_command(label="Current", command=lambda: run())
-run_menu.add_command(label="Power", command=lambda: run())
+#run_menu.add_command(label="Current", command=lambda: run())
+#run_menu.add_command(label="Power", command=lambda: run())
 
 # إضافة قائمة الملف إلى شريط القائمة
 menu_bar.add_cascade(label="tools", menu=tools_menu)
